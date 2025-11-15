@@ -14,6 +14,7 @@ const despachoRoutes = require('./src/routes/despacho.routes');
 const insumoRoutes = require('./src/routes/insumo.routes');
 const ordenCompraRoutes = require('./src/routes/ordenCompra.routes');
 const reporteRoutes = require('./src/routes/reporte.routes');
+const historialRoutes = require('./src/routes/historial.routes.js');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/despachos', despachoRoutes);
 app.use('/api/insumos', insumoRoutes);
 app.use('/api/ordenes-compra', ordenCompraRoutes);
 app.use('/api/reportes', reporteRoutes);
+app.use('/api/historial', historialRoutes);
 
 // Sincronizar base de datos y levantar servidor
 db.sync({ force: false }).then(() => {

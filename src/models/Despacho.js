@@ -1,21 +1,31 @@
 // src/models/Despacho.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 const sequelize = require('../config/database');
-const Usuario = require('./Usuario');
-const Solicitud = require('./Solicitud');
-const Insumo = require('./Insumo');
 
 const Despacho = sequelize.define('Despacho', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     id_solicitud: { type: DataTypes.INTEGER, allowNull: false },
     id_encargado_almacen: { type: DataTypes.INTEGER, allowNull: false },
-    fecha_despacho: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    comentarios: { type: DataTypes.TEXT }
+    fecha: { type: DataTypes.DATE, defaultValue: Sequelize.NOW }, // De tu script SQL
+    estado: {
+        type: DataTypes.ENUM('Realizado', 'Verificado'),
+        defaultValue: 'Realizado'
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+    }
+}, {
+    tableName: 'Despachos',
+    timestamps: true
 });
 
-// Relaciones
-Despacho.belongsTo(Solicitud, { foreignKey: 'id_solicitud', as: 'solicitud' });
-Despacho.belongsTo(Usuario, { foreignKey: 'id_encargado_almacen', as: 'encargado' });
-Despacho.belongsToMany(Insumo, { through: 'DespachoInsumo', as: 'insumos' });
+// NO MÁS RELACIONES AQUÍ
 
 module.exports = Despacho;

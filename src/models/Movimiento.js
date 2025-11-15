@@ -1,24 +1,33 @@
 // src/models/Movimiento.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 const sequelize = require('../config/database');
-const Usuario = require('./Usuario');
-const Insumo = require('./Insumo');
 
 const Movimiento = sequelize.define('Movimiento', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     id_insumo: { type: DataTypes.INTEGER, allowNull: false },
-    id_usuario_responsable: { type: DataTypes.INTEGER, allowNull: false },
-    cantidad: { type: DataTypes.FLOAT, allowNull: false },
-    tipo_movimiento: {
+    tipo: { // De tu script SQL
         type: DataTypes.ENUM('entrada', 'salida', 'merma'),
         allowNull: false
     },
-    fecha_movimiento: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    observacion: { type: DataTypes.STRING }
+    cantidad: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+    id_usuario_registro: { type: DataTypes.INTEGER, allowNull: false }, // De tu script SQL
+    motivo: { type: DataTypes.STRING(255) }, // De tu script SQL
+    id_referencia: { type: DataTypes.INTEGER }, // De tu script SQL
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW
+    }
+}, {
+    tableName: 'Movimientos',
+    timestamps: true
 });
 
-// Relaciones
-Movimiento.belongsTo(Insumo, { foreignKey: 'id_insumo', as: 'insumo' });
-Movimiento.belongsTo(Usuario, { foreignKey: 'id_usuario_responsable', as: 'responsable' });
+// NO MÁS RELACIONES AQUÍ
 
 module.exports = Movimiento;

@@ -1,30 +1,64 @@
 // src/routes/solicitud.routes.js
 const express = require('express');
-const { body } = require('express-validator');
 const router = express.Router();
 const solicitudController = require('../controllers/solicitudController');
 const authMiddleware = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 
-// Ruta para crear una solicitud
-// Se aplica middleware de autenticación y luego se verifica que el rol sea 'chef'
-router.post('/',
+// Obtener solicitudes pendientes de aprobación (para Aprobar)
+router.get(
+    '/pendientes',
     authMiddleware,
-    roleCheck(['chef']),
-    [
-        body('insumos').isArray().withMessage('Los insumos deben ser un array.'),
-        body('comentarios').optional().isString()
-    ],
-    solicitudController.createSolicitud
+    roleCheck(['Jefe de Almacen']),
+    solicitudController.getSolicitudesPendientes
 );
 
-// Ruta para aprobar una solicitud
-router.put('/:id/aprobar',
+/**
+ * @route   GET /api/solicitudes/aprobadas
+ * @desc    (NUEVO) Obtener solicitudes aprobadas listas para ser despachadas
+ * @access  Privado (Jefe de Almacen, Encargado de Almacen)
+ */
+router.get(
+    '/aprobadas',
     authMiddleware,
-    roleCheck(['jefe_almacen']),
+    roleCheck(['Jefe de Almacen', 'Encargado de Almacen']),
+    solicitudController.getSolicitudesAprobadas
+);
+
+/**
+ * @route   POST /api/solicitudes
+ * @desc    Crear una nueva solicitud de insumos
+ * @access  Privado (Chef de Cocina)
+ */
+router.post(
+    '/',
+    authMiddleware,
+    roleCheck(['Chef de Cocina']),
+    solicitudController.crearSolicitud
+);
+
+/**
+ * @route   GET /api/solicitudes
+ * @desc    Consultar todas las solicitudes
+ * @access  Privado (Chef y Almacén)
+ */
+router.get(
+    '/',
+    authMiddleware,
+    roleCheck(['Chef de Cocina', 'Jefe de Almacen', 'Encargado de Almacen']),
+    solicitudController.consultarSolicitudes
+);
+
+/**
+ * @route   PUT /api/solicitudes/:id/aprobar
+ * @desc    Aprobar una solicitud
+ * @access  Privado (Jefe de Almacen)
+ */
+router.put(
+    '/:id/aprobar',
+    authMiddleware,
+    roleCheck(['Jefe de Almacen']),
     solicitudController.aprobarSolicitud
 );
-
-// ... otras rutas para obtener, etc.
 
 module.exports = router;

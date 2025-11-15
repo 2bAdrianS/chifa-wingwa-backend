@@ -1,19 +1,48 @@
 // src/routes/ordenCompra.routes.js
+const express = require('express');
 const router = express.Router();
 const ordenCompraController = require('../controllers/ordenCompraController');
 const authMiddleware = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 
-router.post('/',
+// (NUEVA) Obtener órdenes validadas (listas para recibir)
+router.get(
+    '/validadas',
     authMiddleware,
-    roleCheck(['encargado_almacen']),
-    ordenCompraController.createOrdenCompra
+    roleCheck(['Encargado de Almacen', 'Jefe de Almacen']),
+    ordenCompraController.getOrdenesValidadas
 );
 
-router.put('/:id/validar',
+// Obtener órdenes pendientes (para Compras)
+router.get(
+    '/pendientes',
     authMiddleware,
-    roleCheck(['encargado_compras']),
-    ordenCompraController.validateOrdenCompra
+    roleCheck(['Encargado de Compras', 'Jefe de Almacen']),
+    ordenCompraController.getOrdenesPendientes
+);
+
+// Generar una nueva Orden de Compra (Almacén)
+router.post(
+    '/',
+    authMiddleware,
+    roleCheck(['Encargado de Almacen', 'Jefe de Almacen']),
+    ordenCompraController.crearOrdenCompra
+);
+
+// Validar una Orden de Compra (Compras)
+router.put(
+    '/:id/validar',
+    authMiddleware,
+    roleCheck(['Encargado de Compras']),
+    ordenCompraController.validarOrdenCompra
+);
+
+// Registrar la entrada de una orden (Almacén)
+router.post(
+    '/:id/registrar-entrada',
+    authMiddleware,
+    roleCheck(['Encargado de Almacen', 'Jefe de Almacen']),
+    ordenCompraController.registrarEntrada
 );
 
 module.exports = router;
